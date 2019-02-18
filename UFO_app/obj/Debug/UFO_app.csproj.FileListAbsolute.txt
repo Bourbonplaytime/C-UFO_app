@@ -1,0 +1,13 @@
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\UFO_data.txt
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\UFO_app.exe.config
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\UFO_app.exe
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\UFO_app.pdb
+C:\Users\bourb\source\repos\UFO_app\UFO_app\obj\Debug\UFO_app.csprojAssemblyReference.cache
+C:\Users\bourb\source\repos\UFO_app\UFO_app\obj\Debug\UFO_app.csproj.CoreCompileInputs.cache
+C:\Users\bourb\source\repos\UFO_app\UFO_app\obj\Debug\UFO_app.exe
+C:\Users\bourb\source\repos\UFO_app\UFO_app\obj\Debug\UFO_app.pdb
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\scrubbed.csv
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\Newtonsoft.Json.dll
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\bourb\source\repos\UFO_app\UFO_app\bin\Debug\Newtonsoft.Json.xml
+C:\Users\bourb\source\repos\UFO_app\UFO_app\obj\Debug\UFO_app.csproj.CopyComplete
