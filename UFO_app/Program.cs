@@ -112,6 +112,16 @@ namespace UFO_app
             return sightings;
         }
 
+        public static List<SightingData> RemoveSightings(List<SightingData> sightings)
+        {
+            IEnumerable<SightingData> toRemove = from sighting in sightings where sighting.City == "louisville" select sighting;
+            foreach(SightingData thing in toRemove)
+            {
+                sightings.Remove(thing);
+            }
+            return sightings;
+        }
+
         //public static void DataWriter(List<string[]> sightings, string sourceFile)
         //{
         //    var serializer = new JsonSerializer();
@@ -125,13 +135,6 @@ namespace UFO_app
         //            i++;
         //        }
         //    }
-        //}
-
-        //public static List<string[]> RemoveSightings(List<string[]> sightings)
-        //{
-        //    List<string[]> toRemove = from sighting in sightings where sightingData.City == "louisville" select sighting;
-        //    sightings.Remove(toRemove);
-        //    return sightings;
         //}
     }
 }
