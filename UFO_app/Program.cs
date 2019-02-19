@@ -16,12 +16,12 @@ namespace UFO_app
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
-            foreach(var name in fileContents)
-            {
-                Console.WriteLine(name);
-            }
-            Console.WriteLine(fileContents);
-            Console.Read();
+            //foreach(var name in fileContents)
+            //{
+            //    Console.WriteLine(name);
+            //}
+            //Console.Read();
+            
             //var sourceFile = Path.Combine(directory.FullName, "sightings.json");
             //var sourceContents = DataWriter(sourceFile);
         }
@@ -63,6 +63,82 @@ namespace UFO_app
             }
             return sightings;
         }
+
+        public static IEnumerable<SightingData> GetQuery(List<SightingData> sightings)
+        {
+            Console.WriteLine("Welcome to my UFO sightings app designed to analyze UFO sightings data. \n");
+            Console.WriteLine("Are you interested in a US domestic search? y/n");
+            string domesticSearch = Console.ReadLine();
+            if(domesticSearch.ToLower() == "y")
+            {
+                Console.WriteLine("Would you like to search by City? y/n");
+                string citySearch = Console.ReadLine();
+                if(citySearch.ToLower() == "y")
+                {
+                    Console.WriteLine("Please enter the name of a US city.");
+                    string queryCity = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please enter the US state which contains your US city.");
+                    string queryStateOfCity = Console.ReadLine().ToLower();
+                    IEnumerable<SightingData> searchSightingsUSCity = from sighting in sightings where sighting.City == queryCity && sighting.State == queryStateOfCity select sighting;
+                    return searchSightingsUSCity;
+                }
+                else
+                {
+                    Console.WriteLine("Please enter the name of a US state.");
+                    string queryState = Console.ReadLine().ToLower();
+                    IEnumerable<SightingData> searchSightingsUSState = from sighting in sightings where sighting.State == queryState select sighting;
+                    return searchSightingsUSState;
+
+                }
+            }
+            else if (domesticSearch.ToLower() == "n")
+            {
+                Console.WriteLine("Would you like to search by a non-US country? y/n");
+                string internationalSearch = Console.ReadLine();
+                if(internationalSearch == "y")
+                {
+                    Console.WriteLine("Please enter the name of a non-US country enclosed in brackets for example (canada)");
+                    string queryCountry = Console.ReadLine().ToLower();
+                    IEnumerable<SightingData> searchSightingsCountry = from sighting in sightings where sighting.Country == queryCountry select sighting;
+                    return searchSightingsCountry;
+                }
+                else
+                {
+                    Console.WriteLine("Are you interested in a range of dates? y/n");
+                    string dateRangeInterest = Console.ReadLine();
+                    if (dateRangeInterest.ToLower() == "y")
+                    {
+                        Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
+                        string begDate = Console.ReadLine();
+                        DateTime beginningRange;
+                        if (DateTime.TryParse(begDate, out DateTime begRange))
+                        {
+                            beginningRange = begRange;
+                        }
+                        Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy");
+                        string endDate = Console.ReadLine();
+                        DateTime endingRange;
+                        if (DateTime.TryParse(endDate, out DateTime endRange))
+                        {
+                            endingRange = endRange;
+                        }
+                        IEnumerable<SightingData> searchSightingsDateRange = from sighting in sightings where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
+                        return searchSightingsDateRange;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("I'm sorry no search could be returned.");
+                return null;
+            }
+        }
+
 
         public static List<SightingData> AddSighting(List<SightingData> sightings)
         {
