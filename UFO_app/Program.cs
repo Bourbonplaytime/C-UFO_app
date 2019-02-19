@@ -16,13 +16,19 @@ namespace UFO_app
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
+            foreach(var name in fileContents)
+            {
+                Console.WriteLine(name);
+            }
             Console.WriteLine(fileContents);
-            var sourceFile = Path.Combine(directory.FullName, "sightings.json");
+            Console.Read();
+            //var sourceFile = Path.Combine(directory.FullName, "sightings.json");
+            //var sourceContents = DataWriter(sourceFile);
         }
 
-        public static List<string[]> ReadSightings(string fileName)
+        public static List<SightingData> ReadSightings(string fileName)
         {
-            var sightings = new List<string[]>();
+            var sightings = new List<SightingData>();
             using (var reader = new StreamReader(fileName))
             {
                 string line = "";
@@ -52,64 +58,78 @@ namespace UFO_app
                     {
                         sightingData.Longitude = longitude;
                     }
-                    sightings.Add(values);
+                    sightings.Add(sightingData);
                 }
             }
             return sightings;
         }
 
-        public static List<string[]> AddSighting(List<string[]> sightings)
+        public static List<SightingData> AddSighting(List<SightingData> sightings)
         {
 
-            Console.WriteLine("Would you like to add a sighting? y/n \n");
+            Console.WriteLine("Would you like to add a sighting? y/n");
             string addSighting = Console.ReadLine().ToLower();
             if (addSighting == "y")
             {
-                List<string> newSighting = new List<string>();
+                var newSighting = new SightingData();
                 Console.WriteLine("Please enter a date and time in the format mm/dd/yyyy hh:mm.");
-                newSighting.Add(Console.ReadLine());
+                DateTime sightingDate;
+                var newSightingDate = Console.ReadLine();
+                if (DateTime.TryParse(newSightingDate, out sightingDate))
+                {
+                    newSighting.SightingDate = sightingDate;
+                }
                 Console.WriteLine("Please enter a city.");
-                newSighting.Add(Console.ReadLine());
+                newSighting.City = Console.ReadLine();
                 Console.WriteLine("Please enter a state by two letter abbreviation or if not in a US state just leave blank.");
-                newSighting.Add(Console.ReadLine());
+                newSighting.State = Console.ReadLine();
                 Console.WriteLine("Please enter a country. If in US type us or if international enter the country in () example (canada).");
-                newSighting.Add(Console.ReadLine());
+                newSighting.Country = Console.ReadLine();
                 Console.WriteLine("Please enter the UFOs shape.");
-                newSighting.Add(Console.ReadLine());
+                newSighting.Shape = Console.ReadLine();
                 Console.WriteLine("Please enter the duration of this sighting.");
-                newSighting.Add(Console.ReadLine());
+                newSighting.Duration = Console.ReadLine();
                 Console.WriteLine("Please enter any comments regarding this sighting.");
-                newSighting.Add(Console.ReadLine());
+                newSighting.Comments = Console.ReadLine();
                 Console.WriteLine("Please enter the current date.");
-                newSighting.Add(Console.ReadLine());
+                newSighting.DatePosted = Console.ReadLine();
                 Console.WriteLine("If known please enter the latitude of the sighting.");
-                newSighting.Add(Console.ReadLine());
+                var newLatitude = Console.ReadLine();
+                Double latitude;
+                if (double.TryParse(newLatitude, out latitude))
+                {
+                    newSighting.Latitude = latitude;
+                }
                 Console.WriteLine("If known please enter the longitude of the sighting.");
-                newSighting.Add(Console.ReadLine());
-                string[] addNewSighting = newSighting.ToArray();
-                sightings.Add(addNewSighting);
+                var newLongitude = Console.ReadLine();
+                Double longitude;
+                if (double.TryParse(newLongitude, out longitude))
+                {
+                    newSighting.Longitude = longitude;
+                }
+                sightings.Add(newSighting);
             }
             return sightings;
         }
 
-        public static void DataWriter(List<string[]> sightings, string sourceFile)
-        {
-            var serializer = new JsonSerializer();
-            using (var writer = new StreamWriter(sourceFile))
-            using (var sourceWriter = new JsonTextWriter(writer))
-            {
-                int i = 0;
-                while (i < 100)
-                {
-                    serializer.Serialize(sourceWriter, sightings[i]);
-                    i++;
-                }
-            }
-        }
+        //public static void DataWriter(List<string[]> sightings, string sourceFile)
+        //{
+        //    var serializer = new JsonSerializer();
+        //    using (var writer = new StreamWriter(sourceFile))
+        //    using (var sourceWriter = new JsonTextWriter(writer))
+        //    {
+        //        int i = 0;
+        //        while (i < 100)
+        //        {
+        //            serializer.Serialize(sourceWriter, sightings[i]);
+        //            i++;
+        //        }
+        //    }
+        //}
 
         //public static List<string[]> RemoveSightings(List<string[]> sightings)
         //{
-        //    List<string[]> toRemove = from sighting in sightings where values[1] == "louisville" select sighting;
+        //    List<string[]> toRemove = from sighting in sightings where sightingData.City == "louisville" select sighting;
         //    sightings.Remove(toRemove);
         //    return sightings;
         //}
