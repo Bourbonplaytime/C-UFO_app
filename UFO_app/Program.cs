@@ -17,9 +17,19 @@ namespace UFO_app
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
             var queryResults = GetQuery(fileContents);
-            foreach (var name in queryResults)
+            var queryAfterAdd = AddSighting(queryResults);
+            int i = 0;
+            foreach (var name in queryAfterAdd)
             {
-                Console.WriteLine(name);
+                Console.WriteLine(i + " " + name);
+                i++;
+            }
+            var queryAfterRemove = RemoveSightings(queryAfterAdd);
+            int j = 0;
+            foreach (var name in queryAfterAdd)
+            {
+                Console.WriteLine(j + " " + name);
+                j++;
             }
             Console.Read();
 
@@ -70,38 +80,37 @@ namespace UFO_app
             Console.WriteLine("Welcome to my UFO sightings app designed to analyze UFO sightings data. \n");
             Console.WriteLine("Are you interested in a US domestic search? y/n");
             string domesticSearch = Console.ReadLine();
-            if(domesticSearch.ToLower() == "y")
+            if (domesticSearch.ToLower() == "y")
             {
                 Console.WriteLine("Would you like to search by City? y/n");
                 string citySearch = Console.ReadLine();
-                if(citySearch.ToLower() == "y")
+                if (citySearch.ToLower() == "y")
                 {
                     Console.WriteLine("Please enter the name of a US city.");
                     string queryCity = Console.ReadLine().ToLower();
                     Console.WriteLine("Please enter the US state which contains your US city.");
                     string queryStateOfCity = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> searchSightingsUSCity = from sighting in sightings where sighting.City == queryCity && sighting.State == queryStateOfCity select sighting;
-                    return searchSightingsUSCity;
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.City == queryCity && sighting.State == queryStateOfCity select sighting;
+                    return searchSightingsQuery;
                 }
                 else
                 {
                     Console.WriteLine("Please enter the name of a US state.");
                     string queryState = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> searchSightingsUSState = from sighting in sightings where sighting.State == queryState select sighting;
-                    return searchSightingsUSState;
-
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.State == queryState select sighting;
+                    return searchSightingsQuery;
                 }
             }
             else if (domesticSearch.ToLower() == "n")
             {
                 Console.WriteLine("Would you like to search by a non-US country? y/n");
                 string internationalSearch = Console.ReadLine();
-                if(internationalSearch == "y")
+                if (internationalSearch == "y")
                 {
                     Console.WriteLine("Please enter the name of a non-US country enclosed in brackets for example (canada)");
                     string queryCountry = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> searchSightingsCountry = from sighting in sightings where sighting.Country == queryCountry select sighting;
-                    return searchSightingsCountry;
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.Country == queryCountry select sighting;
+                    return searchSightingsQuery;
                 }
                 else
                 {
@@ -119,30 +128,33 @@ namespace UFO_app
                         DateTime endingRange;
                         DateTime.TryParse(endDate, out DateTime endRange);
                         endingRange = endRange;
-                        IEnumerable<SightingData> searchSightingsDateRange = from sighting in sightings where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
-                        return searchSightingsDateRange;
+                        IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
+                        return searchSightingsQuery;
                     }
                     else
                     {
                         Console.WriteLine("I'm sorry no search could be returned.");
-                        return null;
+                        IEnumerable<SightingData> searchSightingsQuery = new SightingData[0];
+                        return searchSightingsQuery;
                     }
                 }
 
             }
             else
             {
-                Console.WriteLine("I'm sorry no search could be returned.");
-                return null;
+                Console.WriteLine("I'm sorry no search could be returned");
+                IEnumerable<SightingData> searchSightingsQuery = new SightingData[0];
+                return searchSightingsQuery;
             }
         }
 
 
-        public static List<SightingData> AddSighting(List<SightingData> sightings)
+        public static List<SightingData> AddSighting(IEnumerable<SightingData> searchSightingsQuery)
         {
 
             Console.WriteLine("Would you like to add a sighting? y/n");
             string addSighting = Console.ReadLine().ToLower();
+            var addedEntry = searchSightingsQuery.ToList();
             if (addSighting == "y")
             {
                 var newSighting = new SightingData();
@@ -181,19 +193,41 @@ namespace UFO_app
                 {
                     newSighting.Longitude = longitude;
                 }
-                sightings.Add(newSighting);
+                addedEntry.Add(newSighting);
             }
-            return sightings;
+            return addedEntry;
         }
 
-        public static List<SightingData> RemoveSightings(List<SightingData> sightings)
+        public static List<SightingData> RemoveSightings(List<SightingData> addedEntry)
         {
-            IEnumerable<SightingData> toRemove = from sighting in sightings where sighting.City == "louisville" select sighting;
-            foreach(SightingData thing in toRemove)
+            Console.WriteLine("Would you like to remove a result? y/n.");
+            string removeResult = Console.ReadLine();
+            if(removeResult == "y")
             {
-                sightings.Remove(thing);
+                Console.WriteLine("Would you like to remove by city? y/n");
+                string removeByCity = Console.ReadLine();
+                if(removeByCity == "y")
+                {
+                    Console.WriteLine("please enter the name of a city in your search results to remove.");
+                    var cityToRemove = Console.ReadLine();
+                    IEnumerable<SightingData> toRemove = from sighting in addedEntry where sighting.City == cityToRemove select sighting;
+                    var toRemoveList = toRemove.ToList();
+                    foreach (SightingData thing in toRemoveList)
+                    {
+                        addedEntry.Remove(thing);
+                    }
+                    return addedEntry;
+                }
+                else
+                {
+                    return addedEntry;
+                }
+
             }
-            return sightings;
+            else
+            {
+                return addedEntry;
+            }
         }
 
         //public static void DataWriter(List<string[]> sightings, string sourceFile)
