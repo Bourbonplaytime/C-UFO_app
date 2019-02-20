@@ -16,12 +16,13 @@ namespace UFO_app
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
-            //foreach(var name in fileContents)
-            //{
-            //    Console.WriteLine(name);
-            //}
-            //Console.Read();
-            
+            var queryResults = GetQuery(fileContents);
+            foreach (var name in queryResults)
+            {
+                Console.WriteLine(name);
+            }
+            Console.Read();
+
             //var sourceFile = Path.Combine(directory.FullName, "sightings.json");
             //var sourceContents = DataWriter(sourceFile);
         }
@@ -111,22 +112,19 @@ namespace UFO_app
                         Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
                         string begDate = Console.ReadLine();
                         DateTime beginningRange;
-                        if (DateTime.TryParse(begDate, out DateTime begRange))
-                        {
-                            beginningRange = begRange;
-                        }
+                        DateTime.TryParse(begDate, out DateTime begRange);
+                        beginningRange = begRange;
                         Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy");
                         string endDate = Console.ReadLine();
                         DateTime endingRange;
-                        if (DateTime.TryParse(endDate, out DateTime endRange))
-                        {
-                            endingRange = endRange;
-                        }
+                        DateTime.TryParse(endDate, out DateTime endRange);
+                        endingRange = endRange;
                         IEnumerable<SightingData> searchSightingsDateRange = from sighting in sightings where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
                         return searchSightingsDateRange;
                     }
                     else
                     {
+                        Console.WriteLine("I'm sorry no search could be returned.");
                         return null;
                     }
                 }
