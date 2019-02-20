@@ -200,23 +200,61 @@ namespace UFO_app
 
         public static List<SightingData> RemoveSightings(List<SightingData> addedEntry)
         {
-            Console.WriteLine("Would you like to remove a result? y/n.");
+            Console.WriteLine("Would you like to remove a result or results? y/n.");
             string removeResult = Console.ReadLine();
             if(removeResult == "y")
             {
-                Console.WriteLine("Would you like to remove by city? y/n");
+                Console.WriteLine("Would you like to remove all results of a city? y/n");
                 string removeByCity = Console.ReadLine();
                 if(removeByCity == "y")
                 {
                     Console.WriteLine("please enter the name of a city in your search results to remove.");
                     var cityToRemove = Console.ReadLine();
-                    IEnumerable<SightingData> toRemove = from sighting in addedEntry where sighting.City == cityToRemove select sighting;
-                    var toRemoveList = toRemove.ToList();
-                    foreach (SightingData thing in toRemoveList)
+                    IEnumerable<SightingData> toRemoveCity = from sighting in addedEntry where sighting.City == cityToRemove select sighting;
+                    var toRemoveCityList = toRemoveCity.ToList();
+                    foreach (SightingData thing in toRemoveCityList)
                     {
                         addedEntry.Remove(thing);
                     }
                     return addedEntry;
+                }
+                else if(removeByCity == "n")
+                {
+                    Console.WriteLine("Would you like to remove results within a date range? y/n");
+                    var rangeToRemove = Console.ReadLine();
+                    if(rangeToRemove == "y")
+                    {
+                        Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
+                        string begDate = Console.ReadLine();
+                        DateTime beginningRange;
+                        DateTime.TryParse(begDate, out DateTime begRange);
+                        beginningRange = begRange;
+                        Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy");
+                        string endDate = Console.ReadLine();
+                        DateTime endingRange;
+                        DateTime.TryParse(endDate, out DateTime endRange);
+                        endingRange = endRange;
+                        IEnumerable<SightingData> toRemoveRange = from sighting in addedEntry where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
+                        var toRemoveRangeList = toRemoveRange.ToList();
+                        foreach (SightingData thing in toRemoveRangeList)
+                        {
+                            addedEntry.Remove(thing);
+                        }
+                        return addedEntry;
+                    }
+                    else if(rangeToRemove == "n")
+                    {
+                        Console.WriteLine("Ok we will remove by index.");
+                        Console.WriteLine("Please enter an index to remove or press x to exit.");
+                        var indexToRemove = Console.ReadLine();
+                        int intToRemove = int.Parse(indexToRemove);
+                        addedEntry.Remove(addedEntry[intToRemove]);
+                        return addedEntry;
+                    }
+                    else
+                    {
+                        return addedEntry;
+                    }
                 }
                 else
                 {
