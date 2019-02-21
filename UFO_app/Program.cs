@@ -11,7 +11,7 @@ namespace UFO_app
     class Program
     {
         static void Main(string[] args)
-        { 
+        {
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
@@ -32,9 +32,8 @@ namespace UFO_app
                 j++;
             }
             Console.Read();
-
-            //var sourceFile = Path.Combine(directory.FullName, "sightings.json");
-            //var sourceContents = DataWriter(sourceFile);
+            var sourceFile = Path.Combine(directory.FullName, "sightings.json");
+            DataWriter(queryAfterRemove, sourceFile);
         }
 
         public static List<SightingData> ReadSightings(string fileName)
@@ -202,11 +201,11 @@ namespace UFO_app
         {
             Console.WriteLine("Would you like to remove a result or results? y/n.");
             string removeResult = Console.ReadLine();
-            if(removeResult == "y")
+            if (removeResult == "y")
             {
                 Console.WriteLine("Would you like to remove all results of a city? y/n");
                 string removeByCity = Console.ReadLine();
-                if(removeByCity == "y")
+                if (removeByCity == "y")
                 {
                     Console.WriteLine("please enter the name of a city in your search results to remove.");
                     var cityToRemove = Console.ReadLine();
@@ -218,11 +217,11 @@ namespace UFO_app
                     }
                     return addedEntry;
                 }
-                else if(removeByCity == "n")
+                else if (removeByCity == "n")
                 {
                     Console.WriteLine("Would you like to remove results within a date range? y/n");
                     var rangeToRemove = Console.ReadLine();
-                    if(rangeToRemove == "y")
+                    if (rangeToRemove == "y")
                     {
                         Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
                         string begDate = Console.ReadLine();
@@ -242,7 +241,7 @@ namespace UFO_app
                         }
                         return addedEntry;
                     }
-                    else if(rangeToRemove == "n")
+                    else if (rangeToRemove == "n")
                     {
                         Console.WriteLine("Ok we will remove by index.");
                         Console.WriteLine("Please enter an index to remove or press x to exit.");
@@ -268,19 +267,14 @@ namespace UFO_app
             }
         }
 
-        //public static void DataWriter(List<string[]> sightings, string sourceFile)
-        //{
-        //    var serializer = new JsonSerializer();
-        //    using (var writer = new StreamWriter(sourceFile))
-        //    using (var sourceWriter = new JsonTextWriter(writer))
-        //    {
-        //        int i = 0;
-        //        while (i < 100)
-        //        {
-        //            serializer.Serialize(sourceWriter, sightings[i]);
-        //            i++;
-        //        }
-        //    }
-        //}
+        public static void DataWriter(List<SightingData> addedEntry, string sourceFile)
+        {
+            var serializer = new JsonSerializer();
+            using (var writer = new StreamWriter(sourceFile))
+            using (var sourceWriter = new JsonTextWriter(writer))
+            {
+                serializer.Serialize(sourceWriter, addedEntry);
+        }
+        }
     }
 }
