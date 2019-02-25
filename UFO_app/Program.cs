@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using System.Data.Common;
+using System.Configuration;
 
 namespace UFO_app
 {
@@ -12,6 +14,25 @@ namespace UFO_app
     {
         static void Main(string[] args)
         {
+            string provider = ConfigurationManager.AppSettings["provider"];
+            string connectionString = ConfigurationManager.AppSettings["connectionString"];
+            DbProviderFactory factory = DbProviderFactories.GetFactory(provider);
+            using (DbConnection connection = factory.CreateConnection())
+            {
+                if(connection == null)
+                {
+                    Console.WriteLine("Connection error.");
+                    Console.ReadLine();
+                }
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                DbCommand command = factory.CreateCommand();
+                if (command == null)
+                {
+                    Console.WriteLine("Command error.");
+                    Console.ReadLine();
+                }
+            }
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
@@ -34,6 +55,7 @@ namespace UFO_app
             Console.Read();
             var sourceFile = Path.Combine(directory.FullName, "sightings.json");
             DataWriter(queryAfterRemove, sourceFile);
+            CSVWriter(queryAfterRemove, fileName);
         }
 
         public static List<SightingData> ReadSightings(string fileName)
@@ -94,7 +116,7 @@ namespace UFO_app
                 }
                 else
                 {
-                    Console.WriteLine("Please enter the name of a US state.");
+                    Console.WriteLine("Please enter the name of a US state in the form of it's two letter abbreviation.");
                     string queryState = Console.ReadLine().ToLower();
                     IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.State == queryState select sighting;
                     return searchSightingsQuery;
@@ -106,7 +128,7 @@ namespace UFO_app
                 string internationalSearch = Console.ReadLine();
                 if (internationalSearch == "y")
                 {
-                    Console.WriteLine("Please enter the name of a non-US country enclosed in brackets for example (canada)");
+                    Console.WriteLine("Please enter the name of a non-US country enclosed in brackets by two letter abbreviation for example canada would be ca.");
                     string queryCountry = Console.ReadLine().ToLower();
                     IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.Country == queryCountry select sighting;
                     return searchSightingsQuery;
@@ -117,12 +139,12 @@ namespace UFO_app
                     string dateRangeInterest = Console.ReadLine();
                     if (dateRangeInterest.ToLower() == "y")
                     {
-                        Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
+                        Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy hh:mm.");
                         string begDate = Console.ReadLine();
                         DateTime beginningRange;
                         DateTime.TryParse(begDate, out DateTime begRange);
                         beginningRange = begRange;
-                        Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy");
+                        Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy hh:mm.");
                         string endDate = Console.ReadLine();
                         DateTime endingRange;
                         DateTime.TryParse(endDate, out DateTime endRange);
@@ -166,7 +188,7 @@ namespace UFO_app
                 }
                 Console.WriteLine("Please enter a city.");
                 newSighting.City = Console.ReadLine();
-                Console.WriteLine("Please enter a state by two letter abbreviation or if not in a US state just leave blank.");
+                Console.WriteLine("Please enter a state by two letter abbreviation or if in a non-US country just leave blank3.");
                 newSighting.State = Console.ReadLine();
                 Console.WriteLine("Please enter a country. If in US type us or if international enter the country in () example (canada).");
                 newSighting.Country = Console.ReadLine();
@@ -274,7 +296,19 @@ namespace UFO_app
             using (var sourceWriter = new JsonTextWriter(writer))
             {
                 serializer.Serialize(sourceWriter, addedEntry);
+            }
         }
+
+        public static void CSVWriter(List<SightingData> addedEntry, string fileName)
+        {
+            foreach (SightingData thing in addedEntry)
+            {
+                string CSVThing = thing.SightingDate.ToString() + ", " + thing.City + ", " + thing.State + ", " + thing.Country + ", " +
+                                  thing.Shape + ", " + thing.Duration + ", " + thing.Comments + ", " + thing.DatePosted + ", " +
+                                  thing.Latitude.ToString() + ", " + thing.Longitude.ToString() + "\n";
+
+                File.AppendAllText(fileName, CSVThing);
+            }
         }
     }
 }
