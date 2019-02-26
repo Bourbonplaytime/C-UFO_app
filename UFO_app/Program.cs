@@ -38,7 +38,8 @@ namespace UFO_app
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
             var queryResults = GetQuery(fileContents);
-            var queryAfterAdd = AddSighting(queryResults);
+            var newAdd = NewSighting(queryResults);
+            var queryAfterAdd = AddEntry(queryResults, newAdd);
             int i = 0;
             foreach (var name in queryAfterAdd)
             {
@@ -55,7 +56,7 @@ namespace UFO_app
             Console.Read();
             var sourceFile = Path.Combine(directory.FullName, "sightings.json");
             DataWriter(queryAfterRemove, sourceFile);
-            CSVWriter(queryAfterRemove, fileName);
+            CSVWriter(newAdd, fileName);
         }
 
         public static List<SightingData> ReadSightings(string fileName)
@@ -170,15 +171,15 @@ namespace UFO_app
         }
 
 
-        public static List<SightingData> AddSighting(IEnumerable<SightingData> searchSightingsQuery)
+        public static SightingData NewSighting(IEnumerable<SightingData> searchSightingsQuery)
         {
 
             Console.WriteLine("Would you like to add a sighting? y/n");
             string addSighting = Console.ReadLine().ToLower();
             var addedEntry = searchSightingsQuery.ToList();
+            var newSighting = new SightingData();
             if (addSighting == "y")
             {
-                var newSighting = new SightingData();
                 Console.WriteLine("Please enter a date and time in the format mm/dd/yyyy hh:mm.");
                 DateTime sightingDate;
                 var newSightingDate = Console.ReadLine();
@@ -214,8 +215,14 @@ namespace UFO_app
                 {
                     newSighting.Longitude = longitude;
                 }
-                addedEntry.Add(newSighting);
             }
+            return newSighting;
+        }
+
+        public static List<SightingData> AddEntry(IEnumerable<SightingData> searchSightingsQuery, SightingData newSighting)
+        {
+            var addedEntry = searchSightingsQuery.ToList();
+            addedEntry.Add(newSighting);
             return addedEntry;
         }
 
@@ -273,7 +280,7 @@ namespace UFO_app
                         return addedEntry;
                     }
                     else
-                    {
+                    {                        ;
                         return addedEntry;
                     }
                 }
@@ -299,16 +306,13 @@ namespace UFO_app
             }
         }
 
-        public static void CSVWriter(List<SightingData> addedEntry, string fileName)
+        public static void CSVWriter(SightingData newSighting, string fileName)
         {
-            foreach (SightingData thing in addedEntry)
-            {
-                string CSVThing = thing.SightingDate.ToString() + ", " + thing.City + ", " + thing.State + ", " + thing.Country + ", " +
-                                  thing.Shape + ", " + thing.Duration + ", " + thing.Comments + ", " + thing.DatePosted + ", " +
-                                  thing.Latitude.ToString() + ", " + thing.Longitude.ToString() + "\n";
+            string CSVThing = newSighting.SightingDate.ToString() + ", " + newSighting.City + ", " + newSighting.State + ", " + newSighting.Country + ", " +
+                                newSighting.Shape + ", " + newSighting.Duration + ", " + newSighting.Comments + ", " + newSighting.DatePosted + ", " +
+                                newSighting.Latitude.ToString() + ", " + newSighting.Longitude.ToString() + "\n";
 
-                File.AppendAllText(fileName, CSVThing);
-            }
+            File.AppendAllText(fileName, CSVThing);
         }
     }
 }
