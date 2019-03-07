@@ -14,25 +14,25 @@ namespace UFO_app
     {
         static void Main(string[] args)
         {
-            string provider = ConfigurationManager.AppSettings["provider"];
-            string connectionString = ConfigurationManager.AppSettings["connectionString"];
-            DbProviderFactory factory = DbProviderFactories.GetFactory(provider);
-            using (DbConnection connection = factory.CreateConnection())
-            {
-                if(connection == null)
-                {
-                    Console.WriteLine("Connection error.");
-                    Console.ReadLine();
-                }
-                connection.ConnectionString = connectionString;
-                connection.Open();
-                DbCommand command = factory.CreateCommand();
-                if (command == null)
-                {
-                    Console.WriteLine("Command error.");
-                    Console.ReadLine();
-                }
-            }
+            //string provider = ConfigurationManager.AppSettings["provider"];
+            //string connectionString = ConfigurationManager.AppSettings["connectionString"];
+            //DbProviderFactory factory = DbProviderFactories.GetFactory(provider);
+            //using (DbConnection connection = factory.CreateConnection())
+            //{
+            //    if(connection == null)
+            //    {
+            //        Console.WriteLine("Connection error.");
+            //        Console.ReadLine();
+            //    }
+            //    connection.ConnectionString = connectionString;
+            //    connection.Open();
+            //    DbCommand command = factory.CreateCommand();
+            //    if (command == null)
+            //    {
+            //        Console.WriteLine("Command error.");
+            //        Console.ReadLine();
+            //    }
+            //}
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
@@ -53,9 +53,16 @@ namespace UFO_app
                 Console.WriteLine(j + " " + name);
                 j++;
             }
+            var resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
+            var k = 0;
+            foreach (var name in resultsAfterUpdate)
+            {
+                Console.WriteLine(k + " " + name);
+                k++;
+            }
             Console.Read();
             var sourceFile = Path.Combine(directory.FullName, "sightings.json");
-            DataWriter(queryAfterRemove, sourceFile);
+            DataWriter(resultsAfterUpdate, sourceFile);
             CSVWriter(newAdd, fileName);
         }
 
@@ -229,7 +236,7 @@ namespace UFO_app
         public static List<SightingData> RemoveSightings(List<SightingData> addedEntry)
         {
             Console.WriteLine("Would you like to remove a result or results? y/n.");
-            string removeResult = Console.ReadLine();
+            string removeResult = Console.ReadLine().ToLower();
             if (removeResult == "y")
             {
                 Console.WriteLine("Would you like to remove all results of a city? y/n");
@@ -280,7 +287,7 @@ namespace UFO_app
                         return addedEntry;
                     }
                     else
-                    {                        ;
+                    {                        
                         return addedEntry;
                     }
                 }
@@ -289,6 +296,26 @@ namespace UFO_app
                     return addedEntry;
                 }
 
+            }
+            else
+            {
+                return addedEntry;
+            }
+        }
+
+        public static List<SightingData> UpdatedEntries (List<SightingData> addedEntry)
+        {
+            Console.WriteLine("Would you like to update results? y/n");
+            string updateResult = Console.ReadLine();
+            if (updateResult.ToLower() == "y")
+            {
+                Console.WriteLine("Please enter the new city that you would like to update results to.");
+                var updateCity = Console.ReadLine();
+                foreach (SightingData selection in addedEntry)
+                {
+                    selection.City = updateCity;
+                }
+                return addedEntry;
             }
             else
             {
