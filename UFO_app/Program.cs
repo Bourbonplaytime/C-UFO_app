@@ -289,15 +289,6 @@ namespace UFO_app
                         }
                         return fileContents;
                     }
-                    else if (rangeToRemove == "n")
-                    {
-                        Console.WriteLine("Ok we will remove by index.");
-                        Console.WriteLine("Please enter an index to remove or press x to exit.");
-                        var indexToRemove = Console.ReadLine();
-                        int intToRemove = int.Parse(indexToRemove);
-                        fileContents.Remove(fileContents[intToRemove]);
-                        return fileContents;
-                    }
                     else
                     {                        
                         return fileContents;
@@ -321,9 +312,13 @@ namespace UFO_app
             string updateResult = Console.ReadLine().ToLower();
             if (updateResult.ToLower() == "y")
             {
-                Console.WriteLine("Please enter the new city that you would like to update results to.");
+                Console.WriteLine("Please select a city to update.");
+                var cityToUpdate = Console.ReadLine().ToLower();
+                IEnumerable<SightingData> cityUpdate = from sighting in fileContents where sighting.City == cityToUpdate select sighting;
+                List<SightingData> toUpdateCityList = cityUpdate.ToList();
+                Console.WriteLine("Please enter a new city that you would like to update results to.");
                 var updateCity = Console.ReadLine().ToLower();
-                foreach (SightingData selection in fileContents)
+                foreach (SightingData selection in toUpdateCityList)
                 {
                     selection.City = updateCity;
                 }
@@ -351,7 +346,7 @@ namespace UFO_app
             {
                 foreach (SightingData entry in fileContents)
                 {
-                    writer.WriteLine(entry.SightingDate.ToString() + "," + entry.City + "," + entry.State + "," + entry.Country + "," +
+                    writer.WriteLine(entry.SightingDate + "," + entry.City + "," + entry.State + "," + entry.Country + "," +
                                     entry.Shape + "," + entry.Duration + "," + entry.Comments + "," + entry.DatePosted + "," + entry.Latitude +
                                     "," + entry.Longitude);
                 }
