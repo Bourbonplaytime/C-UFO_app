@@ -332,14 +332,17 @@ namespace UFO_app
 
         public static void DataWriter(List<SightingData> fileContents, string sourceFile)
         {
+            int count = fileContents.Count();
             var serializer = new JsonSerializer();
             using (var writer = new StreamWriter(sourceFile))
-            using (var sourceWriter = new JsonTextWriter(writer))
             {
-                serializer.Serialize(sourceWriter, fileContents);
+                //writer.WriteLine("Total sightings in your search is " + count);
+                using (var sourceWriter = new JsonTextWriter(writer))
+                {
+                    serializer.Serialize(sourceWriter, fileContents);
+                }
             }
         }
-
         public static void CSVWriter(List<SightingData> fileContents, string fileName)
         {
             using (var writer = new StreamWriter(fileName))
