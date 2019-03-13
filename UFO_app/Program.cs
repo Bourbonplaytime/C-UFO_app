@@ -12,7 +12,7 @@ namespace UFO_app
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             //string provider = ConfigurationManager.AppSettings["provider"];
             //string connectionString = ConfigurationManager.AppSettings["connectionString"];
@@ -332,7 +332,10 @@ namespace UFO_app
 
         public static void DataWriter(List<SightingData> fileContents, string sourceFile)
         {
-            int count = fileContents.Count();
+            if (fileContents != null)
+            {
+                int count = fileContents.Count();
+            }
             var serializer = new JsonSerializer();
             using (var writer = new StreamWriter(sourceFile))
             {
