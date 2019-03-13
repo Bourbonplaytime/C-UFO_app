@@ -37,33 +37,35 @@ namespace UFO_app
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
-            var queryResults = GetQuery(fileContents);
-            var newAdd = NewSighting(queryResults);
-            var queryAfterAdd = AddEntry(queryResults, newAdd);
-            int i = 0;
-            foreach (var name in queryAfterAdd)
-            {
-                Console.WriteLine(i + " " + name);
-                i++;
-            }
-            var queryAfterRemove = RemoveSightings(queryAfterAdd);
-            int j = 0;
-            foreach (var name in queryAfterAdd)
-            {
-                Console.WriteLine(j + " " + name);
-                j++;
-            }
-            var resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
-            var k = 0;
-            foreach (var name in resultsAfterUpdate)
-            {
-                Console.WriteLine(k + " " + name);
-                k++;
-            }
-            Console.Read();
+            //var queryResults = GetQuery(fileContents);
+            List<SightingData> newAdd = NewSighting(fileContents);
+            //var queryAfterAdd = AddEntry(queryResults, newAdd);
+            //int i = 0;
+            //foreach (var name in queryAfterAdd)
+            //{
+            //    Console.WriteLine(i + " " + name);
+            //    i++;
+            //}
+            List<SightingData> queryAfterRemove = RemoveSightings(fileContents);
+            //{
+            //    Console.WriteLine(j + " " + name);
+            //    j++;
+            //}
+            List<SightingData>resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
+            //var k = 0;
+            //foreach (var name in resultsAfterUpdate)
+            //{
+            //    Console.WriteLine(k + " " + name);
+            //    k++;
+            //}
+            //Console.Read();
+            var queryResults = GetQuery(resultsAfterUpdate);
             var sourceFile = Path.Combine(directory.FullName, "sightings.json");
-            DataWriter(resultsAfterUpdate, sourceFile);
-            CSVWriter(newAdd, fileName);
+            DataWriter(queryResults, sourceFile);
+            //if (newAdd != null)
+            //{
+            CSVWriter(fileContents, fileName);
+            //}
         }
 
         public static List<SightingData> ReadSightings(string fileName)
@@ -104,47 +106,50 @@ namespace UFO_app
             return sightings;
         }
 
-        public static IEnumerable<SightingData> GetQuery(List<SightingData> sightings)
+        public static List<SightingData> GetQuery(List<SightingData> fileContents)
         {
             Console.WriteLine("Welcome to my UFO sightings app designed to analyze UFO sightings data. \n");
             Console.WriteLine("Are you interested in a US domestic search? y/n");
-            string domesticSearch = Console.ReadLine();
+            string domesticSearch = Console.ReadLine().ToLower();
             if (domesticSearch.ToLower() == "y")
             {
                 Console.WriteLine("Would you like to search by City? y/n");
-                string citySearch = Console.ReadLine();
+                string citySearch = Console.ReadLine().ToLower();
                 if (citySearch.ToLower() == "y")
                 {
                     Console.WriteLine("Please enter the name of a US city.");
                     string queryCity = Console.ReadLine().ToLower();
                     Console.WriteLine("Please enter the US state which contains your US city.");
                     string queryStateOfCity = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.City == queryCity && sighting.State == queryStateOfCity select sighting;
-                    return searchSightingsQuery;
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where string.Equals(queryCity, sighting.City, StringComparison.OrdinalIgnoreCase) == true && sighting.State == queryStateOfCity select sighting;
+                    List<SightingData> finalResult = searchSightingsQuery.ToList();
+                    return finalResult;
                 }
                 else
                 {
                     Console.WriteLine("Please enter the name of a US state in the form of it's two letter abbreviation.");
                     string queryState = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.State == queryState select sighting;
-                    return searchSightingsQuery;
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where sighting.State == queryState select sighting;
+                    List<SightingData> finalResult = searchSightingsQuery.ToList();
+                    return finalResult;
                 }
             }
             else if (domesticSearch.ToLower() == "n")
             {
                 Console.WriteLine("Would you like to search by a non-US country? y/n");
-                string internationalSearch = Console.ReadLine();
+                string internationalSearch = Console.ReadLine().ToLower();
                 if (internationalSearch == "y")
                 {
                     Console.WriteLine("Please enter the name of a non-US country enclosed in brackets by two letter abbreviation for example canada would be ca.");
                     string queryCountry = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.Country == queryCountry select sighting;
-                    return searchSightingsQuery;
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where sighting.Country == queryCountry select sighting;
+                    List<SightingData> finalResult = searchSightingsQuery.ToList();
+                    return finalResult;
                 }
                 else
                 {
                     Console.WriteLine("Are you interested in a range of dates? y/n");
-                    string dateRangeInterest = Console.ReadLine();
+                    string dateRangeInterest = Console.ReadLine().ToLower();
                     if (dateRangeInterest.ToLower() == "y")
                     {
                         Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy hh:mm.");
@@ -157,14 +162,14 @@ namespace UFO_app
                         DateTime endingRange;
                         DateTime.TryParse(endDate, out DateTime endRange);
                         endingRange = endRange;
-                        IEnumerable<SightingData> searchSightingsQuery = from sighting in sightings where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
-                        return searchSightingsQuery;
+                        IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
+                        List<SightingData> finalResult = searchSightingsQuery.ToList();
+                        return finalResult;
                     }
                     else
                     {
                         Console.WriteLine("I'm sorry no search could be returned.");
-                        IEnumerable<SightingData> searchSightingsQuery = new SightingData[0];
-                        return searchSightingsQuery;
+                        return null;
                     }
                 }
 
@@ -172,18 +177,18 @@ namespace UFO_app
             else
             {
                 Console.WriteLine("I'm sorry no search could be returned");
-                IEnumerable<SightingData> searchSightingsQuery = new SightingData[0];
-                return searchSightingsQuery;
+                return null;
             }
         }
 
 
-        public static SightingData NewSighting(IEnumerable<SightingData> searchSightingsQuery)
+        //public static SightingData NewSighting(IEnumerable<SightingData> searchSightingsQuery)
+        public static List<SightingData> NewSighting(List<SightingData> fileContents)
         {
 
             Console.WriteLine("Would you like to add a sighting? y/n");
             string addSighting = Console.ReadLine().ToLower();
-            var addedEntry = searchSightingsQuery.ToList();
+            //var addedEntry = searchSightingsQuery.ToList();
             var newSighting = new SightingData();
             if (addSighting == "y")
             {
@@ -195,18 +200,18 @@ namespace UFO_app
                     newSighting.SightingDate = sightingDate;
                 }
                 Console.WriteLine("Please enter a city.");
-                newSighting.City = Console.ReadLine();
+                newSighting.City = Console.ReadLine().ToLower();
                 Console.WriteLine("Please enter a state by two letter abbreviation or if in a non-US country just leave blank3.");
-                newSighting.State = Console.ReadLine();
+                newSighting.State = Console.ReadLine().ToLower();
                 Console.WriteLine("Please enter a country. If in US type us or if international enter the country in () example (canada).");
-                newSighting.Country = Console.ReadLine();
+                newSighting.Country = Console.ReadLine().ToLower();
                 Console.WriteLine("Please enter the UFOs shape.");
-                newSighting.Shape = Console.ReadLine();
+                newSighting.Shape = Console.ReadLine().ToLower();
                 Console.WriteLine("Please enter the duration of this sighting.");
-                newSighting.Duration = Console.ReadLine();
+                newSighting.Duration = Console.ReadLine().ToLower();
                 Console.WriteLine("Please enter any comments regarding this sighting.");
                 newSighting.Comments = Console.ReadLine();
-                Console.WriteLine("Please enter the current date.");
+                Console.WriteLine("Please enter the current date in the format mm/dd/yyyy hh:mm.");
                 newSighting.DatePosted = Console.ReadLine();
                 Console.WriteLine("If known please enter the latitude of the sighting.");
                 var newLatitude = Console.ReadLine();
@@ -222,41 +227,48 @@ namespace UFO_app
                 {
                     newSighting.Longitude = longitude;
                 }
+                fileContents.Add(newSighting);
+                return fileContents;
+                //return newSighting;
             }
-            return newSighting;
+            else
+            {
+                return fileContents;
+            }
         }
 
-        public static List<SightingData> AddEntry(IEnumerable<SightingData> searchSightingsQuery, SightingData newSighting)
-        {
-            var addedEntry = searchSightingsQuery.ToList();
-            addedEntry.Add(newSighting);
-            return addedEntry;
-        }
+        //public static List<SightingData> AddEntry(IEnumerable<SightingData> searchSightingsQuery, SightingData newSighting)
+        //{
+        //    var addedEntry = searchSightingsQuery.ToList();
+        //    addedEntry.Add(newSighting);
+        //    return addedEntry;
+        //}
 
-        public static List<SightingData> RemoveSightings(List<SightingData> addedEntry)
+        //public static List<SightingData> RemoveSightings(List<SightingData> fileContents)
+        public static List<SightingData> RemoveSightings(List<SightingData> fileContents)
         {
             Console.WriteLine("Would you like to remove a result or results? y/n.");
             string removeResult = Console.ReadLine().ToLower();
             if (removeResult == "y")
             {
                 Console.WriteLine("Would you like to remove all results of a city? y/n");
-                string removeByCity = Console.ReadLine();
+                string removeByCity = Console.ReadLine().ToLower();
                 if (removeByCity == "y")
                 {
                     Console.WriteLine("please enter the name of a city in your search results to remove.");
-                    var cityToRemove = Console.ReadLine();
-                    IEnumerable<SightingData> toRemoveCity = from sighting in addedEntry where sighting.City == cityToRemove select sighting;
+                    var cityToRemove = Console.ReadLine().ToLower();
+                    IEnumerable<SightingData> toRemoveCity = from sighting in fileContents where sighting.City == cityToRemove select sighting;
                     var toRemoveCityList = toRemoveCity.ToList();
                     foreach (SightingData thing in toRemoveCityList)
                     {
-                        addedEntry.Remove(thing);
+                        fileContents.Remove(thing);
                     }
-                    return addedEntry;
+                    return fileContents;
                 }
                 else if (removeByCity == "n")
                 {
                     Console.WriteLine("Would you like to remove results within a date range? y/n");
-                    var rangeToRemove = Console.ReadLine();
+                    var rangeToRemove = Console.ReadLine().ToLower();
                     if (rangeToRemove == "y")
                     {
                         Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
@@ -269,13 +281,13 @@ namespace UFO_app
                         DateTime endingRange;
                         DateTime.TryParse(endDate, out DateTime endRange);
                         endingRange = endRange;
-                        IEnumerable<SightingData> toRemoveRange = from sighting in addedEntry where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
+                        IEnumerable<SightingData> toRemoveRange = from sighting in fileContents where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
                         var toRemoveRangeList = toRemoveRange.ToList();
                         foreach (SightingData thing in toRemoveRangeList)
                         {
-                            addedEntry.Remove(thing);
+                            fileContents.Remove(thing);
                         }
-                        return addedEntry;
+                        return fileContents;
                     }
                     else if (rangeToRemove == "n")
                     {
@@ -283,63 +295,72 @@ namespace UFO_app
                         Console.WriteLine("Please enter an index to remove or press x to exit.");
                         var indexToRemove = Console.ReadLine();
                         int intToRemove = int.Parse(indexToRemove);
-                        addedEntry.Remove(addedEntry[intToRemove]);
-                        return addedEntry;
+                        fileContents.Remove(fileContents[intToRemove]);
+                        return fileContents;
                     }
                     else
                     {                        
-                        return addedEntry;
+                        return fileContents;
                     }
                 }
                 else
                 {
-                    return addedEntry;
+                    return fileContents;
                 }
 
             }
             else
             {
-                return addedEntry;
+                return fileContents;
             }
         }
 
-        public static List<SightingData> UpdatedEntries (List<SightingData> addedEntry)
+        public static List<SightingData> UpdatedEntries (List<SightingData> fileContents)
         {
             Console.WriteLine("Would you like to update results? y/n");
-            string updateResult = Console.ReadLine();
+            string updateResult = Console.ReadLine().ToLower();
             if (updateResult.ToLower() == "y")
             {
                 Console.WriteLine("Please enter the new city that you would like to update results to.");
-                var updateCity = Console.ReadLine();
-                foreach (SightingData selection in addedEntry)
+                var updateCity = Console.ReadLine().ToLower();
+                foreach (SightingData selection in fileContents)
                 {
                     selection.City = updateCity;
                 }
-                return addedEntry;
+                return fileContents;
             }
             else
             {
-                return addedEntry;
+                return fileContents;
             }
         }
 
-        public static void DataWriter(List<SightingData> addedEntry, string sourceFile)
+        public static void DataWriter(List<SightingData> fileContents, string sourceFile)
         {
             var serializer = new JsonSerializer();
             using (var writer = new StreamWriter(sourceFile))
             using (var sourceWriter = new JsonTextWriter(writer))
             {
-                serializer.Serialize(sourceWriter, addedEntry);
+                serializer.Serialize(sourceWriter, fileContents);
             }
         }
 
-        public static void CSVWriter(SightingData newSighting, string fileName)
+        public static void CSVWriter(List<SightingData> fileContents, string fileName)
         {
-            string CSVThing = newSighting.SightingDate.ToString() + ", " + newSighting.City + ", " + newSighting.State + ", " + newSighting.Country + ", " +
-                                newSighting.Shape + ", " + newSighting.Duration + ", " + newSighting.Comments + ", " + newSighting.DatePosted + ", " +
-                                newSighting.Latitude.ToString() + ", " + newSighting.Longitude.ToString() + "\n";
+            using (var writer = new StreamWriter(fileName))
+            {
+                foreach (SightingData entry in fileContents)
+                {
+                    writer.WriteLine(entry.SightingDate.ToString() + "," + entry.City + "," + entry.State + "," + entry.Country + "," +
+                                    entry.Shape + "," + entry.Duration + "," + entry.Comments + "," + entry.DatePosted + "," + entry.Latitude +
+                                    "," + entry.Longitude);
+                }
+            }
+        //    string CSVThing = newSighting.SightingDate.ToString() + "," + newSighting.City + "," + newSighting.State + "," + newSighting.Country + "," +
+        //                        newSighting.Shape + "," + newSighting.Duration + "," + newSighting.Comments + "," + newSighting.DatePosted + "," +
+        //                        newSighting.Latitude.ToString() + "," + newSighting.Longitude.ToString() + "\n";
 
-            File.AppendAllText(fileName, CSVThing);
+        //    File.AppendAllText(fileName, CSVThing);
         }
     }
 }
