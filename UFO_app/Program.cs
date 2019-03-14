@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using Newtonsoft.Json;
-using System.Data.Common;
-using System.Configuration;
 
 namespace UFO_app
 {
@@ -14,58 +9,17 @@ namespace UFO_app
     {
         static void Main()
         {
-            //string provider = ConfigurationManager.AppSettings["provider"];
-            //string connectionString = ConfigurationManager.AppSettings["connectionString"];
-            //DbProviderFactory factory = DbProviderFactories.GetFactory(provider);
-            //using (DbConnection connection = factory.CreateConnection())
-            //{
-            //    if(connection == null)
-            //    {
-            //        Console.WriteLine("Connection error.");
-            //        Console.ReadLine();
-            //    }
-            //    connection.ConnectionString = connectionString;
-            //    connection.Open();
-            //    DbCommand command = factory.CreateCommand();
-            //    if (command == null)
-            //    {
-            //        Console.WriteLine("Command error.");
-            //        Console.ReadLine();
-            //    }
-            //}
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
-            //var queryResults = GetQuery(fileContents);
             List<SightingData> newAdd = NewSighting(fileContents);
-            //var queryAfterAdd = AddEntry(queryResults, newAdd);
-            //int i = 0;
-            //foreach (var name in queryAfterAdd)
-            //{
-            //    Console.WriteLine(i + " " + name);
-            //    i++;
-            //}
             List<SightingData> queryAfterRemove = RemoveSightings(fileContents);
-            //{
-            //    Console.WriteLine(j + " " + name);
-            //    j++;
-            //}
-            List<SightingData>resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
-            //var k = 0;
-            //foreach (var name in resultsAfterUpdate)
-            //{
-            //    Console.WriteLine(k + " " + name);
-            //    k++;
-            //}
-            //Console.Read();
-            var queryResults = GetQuery(resultsAfterUpdate);
-            var sourceFile = Path.Combine(directory.FullName, "sightings.json");
-            DataWriter(queryResults, sourceFile);
-            //if (newAdd != null)
-            //{
-            CSVWriter(fileContents, fileName);
-            //}
+            List<SightingData> resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
+            List<SightingData> queryResults = GetQuery(resultsAfterUpdate);
+            //string sourceFile = Path.Combine(directory.FullName, "sightings.json");
+            //DataWriter(queryResults, sourceFile);
+            CSVWriter(queryResults/*fileContents*/, fileName);
         }
 
         public static List<SightingData> ReadSightings(string fileName)
@@ -87,8 +41,8 @@ namespace UFO_app
                     sightingData.State = values[2];
                     sightingData.Country = values[3];
                     sightingData.Shape = values[4];
-                    sightingData.Duration = ConvertToCsvCell(values[5]);
-                    sightingData.Comments = ConvertToCsvCell(values[6]);
+                    sightingData.Duration = values[5];
+                    sightingData.Comments = values[6];
                     sightingData.DatePosted = values[7];
                     Double latitude;
                     if (double.TryParse(values[8], out latitude))
@@ -182,13 +136,11 @@ namespace UFO_app
         }
 
 
-        //public static SightingData NewSighting(IEnumerable<SightingData> searchSightingsQuery)
         public static List<SightingData> NewSighting(List<SightingData> fileContents)
         {
 
             Console.WriteLine("Would you like to add a sighting? y/n");
             string addSighting = Console.ReadLine().ToLower();
-            //var addedEntry = searchSightingsQuery.ToList();
             var newSighting = new SightingData();
             if (addSighting == "y")
             {
@@ -229,7 +181,6 @@ namespace UFO_app
                 }
                 fileContents.Add(newSighting);
                 return fileContents;
-                //return newSighting;
             }
             else
             {
@@ -237,14 +188,6 @@ namespace UFO_app
             }
         }
 
-        //public static List<SightingData> AddEntry(IEnumerable<SightingData> searchSightingsQuery, SightingData newSighting)
-        //{
-        //    var addedEntry = searchSightingsQuery.ToList();
-        //    addedEntry.Add(newSighting);
-        //    return addedEntry;
-        //}
-
-        //public static List<SightingData> RemoveSightings(List<SightingData> fileContents)
         public static List<SightingData> RemoveSightings(List<SightingData> fileContents)
         {
             Console.WriteLine("Would you like to remove a result or results? y/n.");
@@ -332,35 +275,22 @@ namespace UFO_app
             }
         }
 
-        public static void DataWriter(List<SightingData> fileContents, string sourceFile)
-        {
-            if (fileContents != null)
-            {
-                int count = fileContents.Count();
-            }
-            var serializer = new JsonSerializer();
-            using (var writer = new StreamWriter(sourceFile))
-            {
-                //writer.WriteLine("Total sightings in your search is " + count);
-                using (var sourceWriter = new JsonTextWriter(writer))
-                {
-                    serializer.Serialize(sourceWriter, fileContents);
-                }
+        //public static void DataWriter(List<SightingData> fileContents, string sourceFile)
+        //{
+        //    if (fileContents != null)
+        //    {
+        //        int count = fileContents.Count();
+        //    }
+        //    var serializer = new JsonSerializer();
+        //    using (var writer = new StreamWriter(sourceFile))
+        //    {
+        //        using (var sourceWriter = new JsonTextWriter(writer))
+        //        {
+        //            serializer.Serialize(sourceWriter, fileContents);
+        //        }
 
-            }
-        }
-
-        public static string ConvertToCsvCell(string value)
-
-        {
-            var mustQuote = value.Any(x => x == ',' || x == '\"' || x == '\r' || x == '\n');
-            if (!mustQuote)
-            {
-                return value;
-            }
-            value = value.Replace("\"", "\"\"");
-            return string.Format("\"{0}\"", value);
-        }
+        //    }
+        //}
 
         public static void CSVWriter(List<SightingData> fileContents, string fileName)
         {
@@ -373,10 +303,6 @@ namespace UFO_app
                                 "," + entry.Longitude);
                 }
             }
-            //    string CSVThing = newSighting.SightingDate.ToString() + "," + newSighting.City + "," + newSighting.State + "," + newSighting.Country + "," +
-            //                        newSighting.Shape + "," + newSighting.Duration + "," + newSighting.Comments + "," + newSighting.DatePosted + "," +
-            //                        newSighting.Latitude.ToString() + "," + newSighting.Longitude.ToString() + "\n";
-            //    File.AppendAllText(fileName, CSVThing);
         }
     }
 }
