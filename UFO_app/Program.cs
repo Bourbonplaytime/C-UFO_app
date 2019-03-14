@@ -87,8 +87,8 @@ namespace UFO_app
                     sightingData.State = values[2];
                     sightingData.Country = values[3];
                     sightingData.Shape = values[4];
-                    sightingData.Duration = values[5];
-                    sightingData.Comments = values[6];
+                    sightingData.Duration = ConvertToCsvCell(values[5]);
+                    sightingData.Comments = ConvertToCsvCell(values[6]);
                     sightingData.DatePosted = values[7];
                     Double latitude;
                     if (double.TryParse(values[8], out latitude))
@@ -251,13 +251,15 @@ namespace UFO_app
             string removeResult = Console.ReadLine().ToLower();
             if (removeResult == "y")
             {
-                Console.WriteLine("Would you like to remove all results of a city? y/n");
+                Console.WriteLine("Would you like to remove all results of a US city? y/n");
                 string removeByCity = Console.ReadLine().ToLower();
                 if (removeByCity == "y")
                 {
                     Console.WriteLine("please enter the name of a city in your search results to remove.");
                     var cityToRemove = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> toRemoveCity = from sighting in fileContents where sighting.City == cityToRemove select sighting;
+                    Console.WriteLine("Please enter the name of the state which contains your city as a 2 letter abbreviation");
+                    var stateOfCityToRemove = Console.ReadLine().ToLower();
+                    IEnumerable<SightingData> toRemoveCity = from sighting in fileContents where sighting.City == cityToRemove && sighting.State == stateOfCityToRemove select sighting;
                     var toRemoveCityList = toRemoveCity.ToList();
                     foreach (SightingData thing in toRemoveCityList)
                     {
@@ -344,8 +346,22 @@ namespace UFO_app
                 {
                     serializer.Serialize(sourceWriter, fileContents);
                 }
+
             }
         }
+
+        public static string ConvertToCsvCell(string value)
+
+        {
+            var mustQuote = value.Any(x => x == ',' || x == '\"' || x == '\r' || x == '\n');
+            if (!mustQuote)
+            {
+                return value;
+            }
+            value = value.Replace("\"", "\"\"");
+            return string.Format("\"{0}\"", value);
+        }
+
         public static void CSVWriter(List<SightingData> fileContents, string fileName)
         {
             using (var writer = new StreamWriter(fileName))
@@ -353,15 +369,14 @@ namespace UFO_app
                 foreach (SightingData entry in fileContents)
                 {
                     writer.WriteLine(entry.SightingDate + "," + entry.City + "," + entry.State + "," + entry.Country + "," +
-                                    entry.Shape + "," + entry.Duration + "," + entry.Comments + "," + entry.DatePosted + "," + entry.Latitude +
-                                    "," + entry.Longitude);
+                                entry.Shape + "," + entry.Duration + "," + entry.Comments + "," + entry.DatePosted + "," + entry.Latitude +
+                                "," + entry.Longitude);
                 }
             }
-        //    string CSVThing = newSighting.SightingDate.ToString() + "," + newSighting.City + "," + newSighting.State + "," + newSighting.Country + "," +
-        //                        newSighting.Shape + "," + newSighting.Duration + "," + newSighting.Comments + "," + newSighting.DatePosted + "," +
-        //                        newSighting.Latitude.ToString() + "," + newSighting.Longitude.ToString() + "\n";
-
-        //    File.AppendAllText(fileName, CSVThing);
+            //    string CSVThing = newSighting.SightingDate.ToString() + "," + newSighting.City + "," + newSighting.State + "," + newSighting.Country + "," +
+            //                        newSighting.Shape + "," + newSighting.Duration + "," + newSighting.Comments + "," + newSighting.DatePosted + "," +
+            //                        newSighting.Latitude.ToString() + "," + newSighting.Longitude.ToString() + "\n";
+            //    File.AppendAllText(fileName, CSVThing);
         }
     }
 }
