@@ -62,7 +62,6 @@ namespace UFO_app
 
         public static List<SightingData> GetQuery(List<SightingData> fileContents)
         {
-            Console.WriteLine("Welcome to my UFO sightings app designed to analyze UFO sightings data. \n");
             Console.WriteLine("Are you interested in a US domestic search? y/n");
             string domesticSearch = Console.ReadLine().ToLower();
             if (domesticSearch.ToLower() == "y")
@@ -123,7 +122,7 @@ namespace UFO_app
                     else
                     {
                         Console.WriteLine("I'm sorry no search could be returned.");
-                        return null;
+                        return fileContents;
                     }
                 }
 
@@ -131,7 +130,7 @@ namespace UFO_app
             else
             {
                 Console.WriteLine("I'm sorry no search could be returned");
-                return null;
+                return fileContents;
             }
         }
 
@@ -259,7 +258,9 @@ namespace UFO_app
             {
                 Console.WriteLine("Please select a city to update.");
                 var cityToUpdate = Console.ReadLine().ToLower();
-                IEnumerable<SightingData> cityUpdate = from sighting in fileContents where sighting.City == cityToUpdate select sighting;
+                Console.WriteLine("Please select the state which contains this city in 2 letter format.");
+                var stateOfCityToUpdate = Console.ReadLine().ToLower();
+                IEnumerable<SightingData> cityUpdate = from sighting in fileContents where sighting.City == cityToUpdate && sighting.State == stateOfCityToUpdate select sighting;
                 List<SightingData> toUpdateCityList = cityUpdate.ToList();
                 Console.WriteLine("Please enter a new city that you would like to update results to.");
                 var updateCity = Console.ReadLine().ToLower();
