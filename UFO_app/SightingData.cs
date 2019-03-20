@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UFO_app
 {
+    //create the framework for custom objects 
     public class SightingData
     {
         public DateTime SightingDate { get; set; }
@@ -18,9 +19,5 @@ namespace UFO_app
         public string DatePosted { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        //public override string ToString()
-        //{
-        //    return City;
-        //}
     }
 }

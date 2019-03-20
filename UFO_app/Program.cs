@@ -17,11 +17,11 @@ namespace UFO_app
             List<SightingData> queryAfterRemove = RemoveSightings(fileContents);
             List<SightingData> resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
             List<SightingData> queryResults = GetQuery(resultsAfterUpdate);
-            //string sourceFile = Path.Combine(directory.FullName, "sightings.json");
-            //DataWriter(queryResults, sourceFile);
-            CSVWriter(queryResults/*fileContents*/, fileName);
+            CSVWriter(queryResults, fileName);
+            ConsoleWriter(queryResults);
         }
 
+        //Read .csv into a list of custom objects for querying and manipulation then return them back to the program
         public static List<SightingData> ReadSightings(string fileName)
         {
             var sightings = new List<SightingData>();
@@ -60,6 +60,7 @@ namespace UFO_app
             return sightings;
         }
 
+        //Query the list of custom objects based on user picked criteria to create a custom sampling 
         public static List<SightingData> GetQuery(List<SightingData> fileContents)
         {
             Console.WriteLine("Are you interested in a US domestic search? y/n");
@@ -121,7 +122,7 @@ namespace UFO_app
                     }
                     else
                     {
-                        Console.WriteLine("I'm sorry no search could be returned.");
+                        Console.WriteLine("I'm sorry no custom search could be returned.");
                         return fileContents;
                     }
                 }
@@ -129,12 +130,12 @@ namespace UFO_app
             }
             else
             {
-                Console.WriteLine("I'm sorry no search could be returned");
+                Console.WriteLine("I'm sorry no custom search could be returned");
                 return fileContents;
             }
         }
 
-
+        //gives the user an option to add a custom sighting and provide information to the program 
         public static List<SightingData> NewSighting(List<SightingData> fileContents)
         {
 
@@ -187,6 +188,7 @@ namespace UFO_app
             }
         }
 
+        //gives the user an option to remove sightings from the master list so they will be excluded in the final results 
         public static List<SightingData> RemoveSightings(List<SightingData> fileContents)
         {
             Console.WriteLine("Would you like to remove a result or results? y/n.");
@@ -250,6 +252,7 @@ namespace UFO_app
             }
         }
 
+        //allows the user an option to update current entries
         public static List<SightingData> UpdatedEntries (List<SightingData> fileContents)
         {
             Console.WriteLine("Would you like to update results? y/n");
@@ -276,23 +279,7 @@ namespace UFO_app
             }
         }
 
-        //public static void DataWriter(List<SightingData> fileContents, string sourceFile)
-        //{
-        //    if (fileContents != null)
-        //    {
-        //        int count = fileContents.Count();
-        //    }
-        //    var serializer = new JsonSerializer();
-        //    using (var writer = new StreamWriter(sourceFile))
-        //    {
-        //        using (var sourceWriter = new JsonTextWriter(writer))
-        //        {
-        //            serializer.Serialize(sourceWriter, fileContents);
-        //        }
-
-        //    }
-        //}
-
+        //write the final results set to the .csv. This overwrites the original data to only return the custom dataset
         public static void CSVWriter(List<SightingData> fileContents, string fileName)
         {
             using (var writer = new StreamWriter(fileName))
@@ -302,8 +289,22 @@ namespace UFO_app
                     writer.WriteLine(entry.SightingDate + "," + entry.City + "," + entry.State + "," + entry.Country + "," +
                                 entry.Shape + "," + entry.Duration + "," + entry.Comments + "," + entry.DatePosted + "," + entry.Latitude +
                                 "," + entry.Longitude);
+
                 }
             }
+        }
+
+        //write the final results to the console
+        public static void ConsoleWriter(List<SightingData> queryResults)
+        {
+            foreach(SightingData UFO in queryResults)
+            {
+                Console.WriteLine(UFO.SightingDate + "," + UFO.City + "," + UFO.State + "," + UFO.Country + "," +
+                            UFO.Shape + "," + UFO.Duration + "," + UFO.Comments + "," + UFO.DatePosted + "," + UFO.Latitude +
+                            "," + UFO.Longitude);
+            }
+            Console.WriteLine("The total number of matches for this search is " + queryResults.Count());
+            Console.ReadLine();
         }
     }
 }
