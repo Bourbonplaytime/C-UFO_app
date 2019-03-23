@@ -142,45 +142,59 @@ namespace UFO_app
 
             Console.WriteLine("Would you like to add a sighting? y/n");
             string addSighting = Console.ReadLine().ToLower();
-            var newSighting = new SightingData();
             if (addSighting == "y")
             {
-                Console.WriteLine("Please enter a date and time in the format mm/dd/yyyy hh:mm.");
-                DateTime sightingDate;
-                var newSightingDate = Console.ReadLine();
-                if (DateTime.TryParse(newSightingDate, out sightingDate))
+                bool keepAdding = true;
+                while(keepAdding)
                 {
-                    newSighting.SightingDate = sightingDate;
+                    var newSighting = new SightingData();
+                    Console.WriteLine("Please enter a date and time in the format mm/dd/yyyy hh:mm.");
+                    DateTime sightingDate;
+                    var newSightingDate = Console.ReadLine();
+                    if (DateTime.TryParse(newSightingDate, out sightingDate))
+                    {
+                        newSighting.SightingDate = sightingDate;
+                    }
+                    Console.WriteLine("Please enter a city.");
+                    newSighting.City = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please enter a state by two letter abbreviation or if in a non-US country just leave blank.");
+                    newSighting.State = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please enter a country. If in US type us or if international use two letter abbreviation.");
+                    newSighting.Country = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please enter the UFOs shape.");
+                    newSighting.Shape = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please enter the duration of this sighting.");
+                    newSighting.Duration = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please enter any comments regarding this sighting.");
+                    newSighting.Comments = Console.ReadLine();
+                    Console.WriteLine("Please enter the current date in the format mm/dd/yyyy hh:mm.");
+                    newSighting.DatePosted = Console.ReadLine();
+                    Console.WriteLine("If known please enter the latitude of the sighting.");
+                    var newLatitude = Console.ReadLine();
+                    Double latitude;
+                    if (double.TryParse(newLatitude, out latitude))
+                    {
+                        newSighting.Latitude = latitude;
+                    }
+                    Console.WriteLine("If known please enter the longitude of the sighting.");
+                    var newLongitude = Console.ReadLine();
+                    Double longitude;
+                    if (double.TryParse(newLongitude, out longitude))
+                    {
+                        newSighting.Longitude = longitude;
+                    }
+                    fileContents.Add(newSighting);
+                    Console.WriteLine("Do you have another entry to add? y/n");
+                    string keepGoing = Console.ReadLine().ToLower();
+                    if(keepGoing != "y")
+                    {
+                        keepAdding = false;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
-                Console.WriteLine("Please enter a city.");
-                newSighting.City = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter a state by two letter abbreviation or if in a non-US country just leave blank.");
-                newSighting.State = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter a country. If in US type us or if international use two letter abbreviation.");
-                newSighting.Country = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter the UFOs shape.");
-                newSighting.Shape = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter the duration of this sighting.");
-                newSighting.Duration = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter any comments regarding this sighting.");
-                newSighting.Comments = Console.ReadLine();
-                Console.WriteLine("Please enter the current date in the format mm/dd/yyyy hh:mm.");
-                newSighting.DatePosted = Console.ReadLine();
-                Console.WriteLine("If known please enter the latitude of the sighting.");
-                var newLatitude = Console.ReadLine();
-                Double latitude;
-                if (double.TryParse(newLatitude, out latitude))
-                {
-                    newSighting.Latitude = latitude;
-                }
-                Console.WriteLine("If known please enter the longitude of the sighting.");
-                var newLongitude = Console.ReadLine();
-                Double longitude;
-                if (double.TryParse(newLongitude, out longitude))
-                {
-                    newSighting.Longitude = longitude;
-                }
-                fileContents.Add(newSighting);
                 return fileContents;
             }
             else
