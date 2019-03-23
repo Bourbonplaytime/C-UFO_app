@@ -15,10 +15,11 @@ namespace UFO_app
             var fileContents = ReadSightings(fileName);
             List<SightingData> newAdd = NewSighting(fileContents);
             List<SightingData> queryAfterRemove = RemoveSightings(fileContents);
-            List<SightingData> resultsAfterUpdate = UpdatedEntries(queryAfterRemove);
-            List<SightingData> queryResults = GetQuery(resultsAfterUpdate);
-            CSVWriter(queryResults, fileName);
+            List<SightingData> queryResults = GetQuery(queryAfterRemove);
             ConsoleWriter(queryResults);
+            List<SightingData> resultsAfterUpdate = UpdatedEntries(queryResults);;
+            CSVWriter(resultsAfterUpdate, fileName);
+            ConsoleWriter(resultsAfterUpdate);
         }
 
         //Read .csv into a list of custom objects for querying and manipulation then return them back to the program
@@ -94,7 +95,7 @@ namespace UFO_app
                 string internationalSearch = Console.ReadLine().ToLower();
                 if (internationalSearch == "y")
                 {
-                    Console.WriteLine("Please enter the name of a non-US country enclosed in brackets by two letter abbreviation for example canada would be ca.");
+                    Console.WriteLine("Please enter the name of a non-US country by two letter abbreviation.");
                     string queryCountry = Console.ReadLine().ToLower();
                     IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where sighting.Country == queryCountry select sighting;
                     List<SightingData> finalResult = searchSightingsQuery.ToList();
@@ -153,9 +154,9 @@ namespace UFO_app
                 }
                 Console.WriteLine("Please enter a city.");
                 newSighting.City = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter a state by two letter abbreviation or if in a non-US country just leave blank3.");
+                Console.WriteLine("Please enter a state by two letter abbreviation or if in a non-US country just leave blank.");
                 newSighting.State = Console.ReadLine().ToLower();
-                Console.WriteLine("Please enter a country. If in US type us or if international enter the country in () example (canada).");
+                Console.WriteLine("Please enter a country. If in US type us or if international use two letter abbreviation.");
                 newSighting.Country = Console.ReadLine().ToLower();
                 Console.WriteLine("Please enter the UFOs shape.");
                 newSighting.Shape = Console.ReadLine().ToLower();
@@ -257,21 +258,67 @@ namespace UFO_app
         {
             Console.WriteLine("Would you like to update results? y/n");
             string updateResult = Console.ReadLine().ToLower();
-            if (updateResult.ToLower() == "y")
+            if (updateResult == "y")
             {
-                Console.WriteLine("Please select a city to update.");
-                var cityToUpdate = Console.ReadLine().ToLower();
-                Console.WriteLine("Please select the state which contains this city in 2 letter format.");
-                var stateOfCityToUpdate = Console.ReadLine().ToLower();
-                IEnumerable<SightingData> cityUpdate = from sighting in fileContents where sighting.City == cityToUpdate && sighting.State == stateOfCityToUpdate select sighting;
-                List<SightingData> toUpdateCityList = cityUpdate.ToList();
-                Console.WriteLine("Please enter a new city that you would like to update results to.");
-                var updateCity = Console.ReadLine().ToLower();
-                foreach (SightingData selection in toUpdateCityList)
+                Console.WriteLine("Would you like to update results by US city? y/n");
+                string updateUSCity = Console.ReadLine().ToLower();
+                if(updateUSCity == "y")
                 {
-                    selection.City = updateCity;
+                    Console.WriteLine("Please select a city to update.");
+                    var cityToUpdate = Console.ReadLine().ToLower();
+                    Console.WriteLine("Please select the state which contains this city in 2 letter format.");
+                    var stateOfCityToUpdate = Console.ReadLine().ToLower();
+                    IEnumerable<SightingData> cityUpdate = from sighting in fileContents where sighting.City == cityToUpdate && sighting.State == stateOfCityToUpdate select sighting;
+                    List<SightingData> toUpdateCityList = cityUpdate.ToList();
+                    Console.WriteLine("Please enter a new city that you would like to update results to.");
+                    var updateCity = Console.ReadLine().ToLower();
+                    foreach (SightingData selection in toUpdateCityList)
+                    {
+                        selection.City = updateCity;
+                    }
+                    return fileContents;
                 }
-                return fileContents;
+                else
+                {
+                    Console.WriteLine("Would you like to update results by international city? y/n");
+                    string updateInternational = Console.ReadLine().ToLower();
+                    if(updateInternational == "y")
+                    {
+                        Console.WriteLine("Please select a city to update.");
+                        var internationalUpdate = Console.ReadLine().ToLower();
+                        Console.WriteLine("Please enter the name of a non-US country as a two letter abbreviation.");
+                        var countryOfCityToUpdate = Console.ReadLine().ToLower();
+                        IEnumerable<SightingData> internationalCityUpdate = from sighting in fileContents where sighting.City.Contains(internationalUpdate) && sighting.Country == countryOfCityToUpdate select sighting;
+                        List<SightingData> toUpdateCityList = internationalCityUpdate.ToList();
+                        Console.WriteLine("Please enter a new city that you would like to update results to.");
+                        var updateInCity = Console.ReadLine().ToLower();
+                        foreach (SightingData selection in toUpdateCityList)
+                        {
+                            selection.City = updateInCity;
+                        }
+                        return fileContents;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter a date to update in the format mm/dd/yyyy hh:mm");
+                        string updateDate = Console.ReadLine();
+                        DateTime dateToBeUpdated;
+                        DateTime.TryParse(updateDate, out DateTime parsedDate);
+                        dateToBeUpdated = parsedDate;
+                        IEnumerable<SightingData> updateQuery = from sighting in fileContents where sighting.SightingDate == dateToBeUpdated select sighting;
+                        List<SightingData> listToUpdate = updateQuery.ToList();
+                        Console.WriteLine("Please enter a date to update selection to in the format mm/dd/yyyy hh:mm");
+                        string dateUpdatedTo = Console.ReadLine();
+                        DateTime dateUpdated;
+                        DateTime.TryParse(dateUpdatedTo, out DateTime parsedUpdatedDate);
+                        dateUpdated = parsedUpdatedDate;
+                        foreach(SightingData selection in listToUpdate)
+                        {
+                            selection.SightingDate = dateUpdated;
+                        }
+                        return fileContents;
+                    }
+                }
             }
             else
             {
@@ -280,11 +327,11 @@ namespace UFO_app
         }
 
         //write the final results set to the .csv. This overwrites the original data to only return the custom dataset
-        public static void CSVWriter(List<SightingData> fileContents, string fileName)
+        public static void CSVWriter(List<SightingData> finalResult, string fileName)
         {
             using (var writer = new StreamWriter(fileName))
             {
-                foreach (SightingData entry in fileContents)
+                foreach (SightingData entry in finalResult)
                 {
                     writer.WriteLine(entry.SightingDate + "," + entry.City + "," + entry.State + "," + entry.Country + "," +
                                 entry.Shape + "," + entry.Duration + "," + entry.Comments + "," + entry.DatePosted + "," + entry.Latitude +
