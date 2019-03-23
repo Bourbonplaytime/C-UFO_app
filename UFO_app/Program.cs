@@ -14,7 +14,7 @@ namespace UFO_app
             var fileName = Path.Combine(directory.FullName, "scrubbed.csv");
             var fileContents = ReadSightings(fileName);
             List<SightingData> newAdd = NewSighting(fileContents);
-            List<SightingData> queryAfterRemove = RemoveSightings(fileContents);
+            List<SightingData> queryAfterRemove = RemoveSightings(newAdd);
             List<SightingData> queryResults = GetQuery(queryAfterRemove);
             ConsoleWriter(queryResults);
             List<SightingData> resultsAfterUpdate = UpdatedEntries(queryResults);;
