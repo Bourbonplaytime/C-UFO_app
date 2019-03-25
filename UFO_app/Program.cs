@@ -79,7 +79,7 @@ namespace UFO_app
                     Console.WriteLine("Please enter the US state which contains your US city.");
                     string queryStateOfCity = Console.ReadLine().ToLower();
                     //system.linq query
-                    IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where string.Equals(queryCity, sighting.City, StringComparison.OrdinalIgnoreCase) == true && sighting.State == queryStateOfCity select sighting;
+                    IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where sighting.City == queryCity && sighting.State == queryStateOfCity select sighting;
                     List<SightingData> finalResult = searchSightingsQuery.ToList();
                     return finalResult;
                 }
