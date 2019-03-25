@@ -18,7 +18,7 @@ namespace UFO_app
             List<SightingData> queryResults = GetQuery(queryAfterRemove);
             ConsoleWriter(queryResults);
             List<SightingData> resultsAfterUpdate = UpdatedEntries(queryResults);;
-            CSVWriter(resultsAfterUpdate, fileName);
+            //CSVWriter(resultsAfterUpdate, fileName);
             ConsoleWriter(resultsAfterUpdate);
         }
 
@@ -144,6 +144,7 @@ namespace UFO_app
             string addSighting = Console.ReadLine().ToLower();
             if (addSighting == "y")
             {
+                // allows for multiple iterations through the loop enabling adding multiple entries at one time 
                 bool keepAdding = true;
                 while(keepAdding)
                 {
@@ -210,56 +211,190 @@ namespace UFO_app
             string removeResult = Console.ReadLine().ToLower();
             if (removeResult == "y")
             {
-                Console.WriteLine("Would you like to remove all results of a US city? y/n");
-                string removeByCity = Console.ReadLine().ToLower();
-                if (removeByCity == "y")
+                bool keepRemoving = true;
+                while (keepRemoving)
                 {
-                    Console.WriteLine("please enter the name of a city in your search results to remove.");
-                    var cityToRemove = Console.ReadLine().ToLower();
-                    Console.WriteLine("Please enter the name of the state which contains your city as a 2 letter abbreviation");
-                    var stateOfCityToRemove = Console.ReadLine().ToLower();
-                    IEnumerable<SightingData> toRemoveCity = from sighting in fileContents where sighting.City == cityToRemove && sighting.State == stateOfCityToRemove select sighting;
-                    var toRemoveCityList = toRemoveCity.ToList();
-                    foreach (SightingData thing in toRemoveCityList)
+                    //while here
+                    Console.WriteLine("Would you like to remove a US domestic result set? y/n");
+                    string removeDomestic = Console.ReadLine().ToLower();
+                    if (removeDomestic == "y")
                     {
-                        fileContents.Remove(thing);
-                    }
-                    return fileContents;
-                }
-                else if (removeByCity == "n")
-                {
-                    Console.WriteLine("Would you like to remove results within a date range? y/n");
-                    var rangeToRemove = Console.ReadLine().ToLower();
-                    if (rangeToRemove == "y")
-                    {
-                        Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
-                        string begDate = Console.ReadLine();
-                        DateTime beginningRange;
-                        DateTime.TryParse(begDate, out DateTime begRange);
-                        beginningRange = begRange;
-                        Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy");
-                        string endDate = Console.ReadLine();
-                        DateTime endingRange;
-                        DateTime.TryParse(endDate, out DateTime endRange);
-                        endingRange = endRange;
-                        IEnumerable<SightingData> toRemoveRange = from sighting in fileContents where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
-                        var toRemoveRangeList = toRemoveRange.ToList();
-                        foreach (SightingData thing in toRemoveRangeList)
+                        Console.WriteLine("Would you like to remove all results of a US city? y/n");
+                        string removeByCity = Console.ReadLine().ToLower();
+                        if (removeByCity == "y")
                         {
-                            fileContents.Remove(thing);
+                            Console.WriteLine("please enter the name of a city in your search results to remove.");
+                            var cityToRemove = Console.ReadLine().ToLower();
+                            Console.WriteLine("Please enter the name of the state which contains your city as a 2 letter abbreviation");
+                            var stateOfCityToRemove = Console.ReadLine().ToLower();
+                            IEnumerable<SightingData> toRemoveCity = from sighting in fileContents where sighting.City == cityToRemove && sighting.State == stateOfCityToRemove select sighting;
+                            var toRemoveCityList = toRemoveCity.ToList();
+                            foreach (SightingData thing in toRemoveCityList)
+                            {
+                                fileContents.Remove(thing);
+                            }
+                            Console.WriteLine("Do you have another entry to remove? y/n");
+                            string keepGoing = Console.ReadLine().ToLower();
+                            if (keepGoing != "y")
+                            {
+                                keepRemoving = false;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            return fileContents;
                         }
-                        return fileContents;
+                        else
+                        {
+                            Console.WriteLine("Would you like to remove all results of a US state? y/n");
+                            string removeByState = Console.ReadLine().ToLower();
+                            if (removeByState == "y")
+                            {
+                                Console.WriteLine("Please enter the name of a state as a 2 letter abbreviation");
+                                var stateToRemove = Console.ReadLine().ToLower();
+                                IEnumerable<SightingData> toRemoveState = from sighting in fileContents where sighting.State == stateToRemove select sighting;
+                                var toRemoveStateList = toRemoveState.ToList();
+                                foreach (SightingData thing in toRemoveStateList)
+                                {
+                                    fileContents.Remove(thing);
+                                }
+                                Console.WriteLine("Do you have another entry to remove? y/n");
+                                string keepGoing = Console.ReadLine().ToLower();
+                                if (keepGoing != "y")
+                                {
+                                    keepRemoving = false;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                return fileContents;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Do you have another entry to remove? y/n");
+                                string keepGoing = Console.ReadLine().ToLower();
+                                if (keepGoing != "y")
+                                {
+                                    keepRemoving = false;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                return fileContents;
+                            }
+                        }
+
                     }
                     else
-                    {                        
-                        return fileContents;
+                    {
+                        Console.WriteLine("Would you like to remove an international results set? y/n");
+                        string removeInternational = Console.ReadLine().ToLower();
+                        if (removeInternational == "y")
+                        {
+                            Console.WriteLine("Would you like to remove all results of an International city? y/n");
+                            string removeForeignCity = Console.ReadLine().ToLower();
+                            if (removeForeignCity == "y")
+                            {
+                                Console.WriteLine("please enter the name of a city in your search results to remove.");
+                                var cityToRemove = Console.ReadLine().ToLower();
+                                Console.WriteLine("Please enter the name of the country which contains your city as a 2 letter abbreviation");
+                                var countryOfCityToRemove = Console.ReadLine().ToLower();
+                                IEnumerable<SightingData> toRemoveCity = from sighting in fileContents where sighting.City.Contains(cityToRemove) && sighting.Country == countryOfCityToRemove select sighting;
+                                var toRemoveCityList = toRemoveCity.ToList();
+                                foreach (SightingData thing in toRemoveCityList)
+                                {
+                                    fileContents.Remove(thing);
+                                }
+                                Console.WriteLine("Do you have another entry to remove? y/n");
+                                string keepGoing = Console.ReadLine().ToLower();
+                                if (keepGoing != "y")
+                                {
+                                    keepRemoving = false;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                return fileContents;
+                            }
+                            else
+                            {
+                                Console.WriteLine("please enter the name of a country by two letter abbreviation");
+                                string removeCountry = Console.ReadLine().ToLower();
+                                IEnumerable<SightingData> toRemoveCountry = from sighting in fileContents where sighting.Country == removeCountry select sighting;
+                                var toRemoveCountryList = toRemoveCountry.ToList();
+                                foreach (SightingData thing in toRemoveCountryList)
+                                {
+                                    fileContents.Remove(thing);
+                                }
+                                Console.WriteLine("Do you have another entry to remove? y/n");
+                                string keepGoing = Console.ReadLine().ToLower();
+                                if (keepGoing != "y")
+                                {
+                                    keepRemoving = false;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                return fileContents;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Would you like to remove results within a date range? y/n");
+                            var rangeToRemove = Console.ReadLine().ToLower();
+                            if (rangeToRemove == "y")
+                            {
+                                Console.WriteLine("Please enter a beginning date in the format mm/dd/yyyy");
+                                string begDate = Console.ReadLine();
+                                DateTime beginningRange;
+                                DateTime.TryParse(begDate, out DateTime begRange);
+                                beginningRange = begRange;
+                                Console.WriteLine("Please enter an ending date in the format mm/dd/yyyy");
+                                string endDate = Console.ReadLine();
+                                DateTime endingRange;
+                                DateTime.TryParse(endDate, out DateTime endRange);
+                                endingRange = endRange;
+                                IEnumerable<SightingData> toRemoveRange = from sighting in fileContents where sighting.SightingDate > beginningRange && sighting.SightingDate < endingRange select sighting;
+                                var toRemoveRangeList = toRemoveRange.ToList();
+                                foreach (SightingData thing in toRemoveRangeList)
+                                {
+                                    fileContents.Remove(thing);
+                                }
+                                Console.WriteLine("Do you have another entry to remove? y/n");
+                                string keepGoing = Console.ReadLine().ToLower();
+                                if (keepGoing != "y")
+                                {
+                                    keepRemoving = false;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                return fileContents;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Do you have another entry to remove? y/n");
+                                string keepGoing = Console.ReadLine().ToLower();
+                                if (keepGoing != "y")
+                                {
+                                    keepRemoving = false;
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+                                return fileContents;
+                            }
+                        }
                     }
                 }
-                else
-                {
-                    return fileContents;
-                }
-
+                return fileContents;
             }
             else
             {
@@ -314,22 +449,6 @@ namespace UFO_app
                     }
                     else
                     {
-                        Console.WriteLine("Please enter a date to update in the format mm/dd/yyyy hh:mm");
-                        string updateDate = Console.ReadLine();
-                        DateTime dateToBeUpdated;
-                        DateTime.TryParse(updateDate, out DateTime parsedDate);
-                        dateToBeUpdated = parsedDate;
-                        IEnumerable<SightingData> updateQuery = from sighting in fileContents where sighting.SightingDate == dateToBeUpdated select sighting;
-                        List<SightingData> listToUpdate = updateQuery.ToList();
-                        Console.WriteLine("Please enter a date to update selection to in the format mm/dd/yyyy hh:mm");
-                        string dateUpdatedTo = Console.ReadLine();
-                        DateTime dateUpdated;
-                        DateTime.TryParse(dateUpdatedTo, out DateTime parsedUpdatedDate);
-                        dateUpdated = parsedUpdatedDate;
-                        foreach(SightingData selection in listToUpdate)
-                        {
-                            selection.SightingDate = dateUpdated;
-                        }
                         return fileContents;
                     }
                 }
