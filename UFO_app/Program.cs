@@ -64,6 +64,7 @@ namespace UFO_app
         //Query the list of custom objects based on user picked criteria to create a custom sampling 
         public static List<SightingData> GetQuery(List<SightingData> fileContents)
         {
+            //domestic searching
             Console.WriteLine("Are you interested in a US domestic search? y/n");
             string domesticSearch = Console.ReadLine().ToLower();
             if (domesticSearch.ToLower() == "y")
@@ -72,10 +73,12 @@ namespace UFO_app
                 string citySearch = Console.ReadLine().ToLower();
                 if (citySearch.ToLower() == "y")
                 {
+                    //i/o
                     Console.WriteLine("Please enter the name of a US city.");
                     string queryCity = Console.ReadLine().ToLower();
                     Console.WriteLine("Please enter the US state which contains your US city.");
                     string queryStateOfCity = Console.ReadLine().ToLower();
+                    //system.linq query
                     IEnumerable<SightingData> searchSightingsQuery = from sighting in fileContents where string.Equals(queryCity, sighting.City, StringComparison.OrdinalIgnoreCase) == true && sighting.State == queryStateOfCity select sighting;
                     List<SightingData> finalResult = searchSightingsQuery.ToList();
                     return finalResult;
@@ -91,6 +94,7 @@ namespace UFO_app
             }
             else if (domesticSearch.ToLower() == "n")
             {
+                //international searching
                 Console.WriteLine("Would you like to search by a non-US country? y/n");
                 string internationalSearch = Console.ReadLine().ToLower();
                 if (internationalSearch == "y")
@@ -103,6 +107,7 @@ namespace UFO_app
                 }
                 else
                 {
+                    //date searching
                     Console.WriteLine("Are you interested in a range of dates? y/n");
                     string dateRangeInterest = Console.ReadLine().ToLower();
                     if (dateRangeInterest.ToLower() == "y")
@@ -148,6 +153,7 @@ namespace UFO_app
                 bool keepAdding = true;
                 while(keepAdding)
                 {
+                    //custom object creation
                     var newSighting = new SightingData();
                     Console.WriteLine("Please enter a date and time in the format mm/dd/yyyy hh:mm.");
                     DateTime sightingDate;
@@ -214,7 +220,6 @@ namespace UFO_app
                 bool keepRemoving = true;
                 while (keepRemoving)
                 {
-                    //while here
                     Console.WriteLine("Would you like to remove a US domestic result set? y/n");
                     string removeDomestic = Console.ReadLine().ToLower();
                     if (removeDomestic == "y")
