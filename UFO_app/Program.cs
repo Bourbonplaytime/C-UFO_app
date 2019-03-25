@@ -15,11 +15,10 @@ namespace UFO_app
             var fileContents = ReadSightings(fileName);
             List<SightingData> newAdd = NewSighting(fileContents);
             List<SightingData> queryAfterRemove = RemoveSightings(newAdd);
+            List<SightingData> resultsAfterUpdate = UpdatedEntries(queryAfterRemove);;
+            CSVWriter(resultsAfterUpdate, fileName);
             List<SightingData> queryResults = GetQuery(queryAfterRemove);
             ConsoleWriter(queryResults);
-            List<SightingData> resultsAfterUpdate = UpdatedEntries(queryResults);;
-            CSVWriter(resultsAfterUpdate, fileName);
-            ConsoleWriter(resultsAfterUpdate);
         }
 
         //Read .csv into a list of custom objects for querying and manipulation then return them back to the program
