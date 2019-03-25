@@ -18,7 +18,7 @@ namespace UFO_app
             List<SightingData> queryResults = GetQuery(queryAfterRemove);
             ConsoleWriter(queryResults);
             List<SightingData> resultsAfterUpdate = UpdatedEntries(queryResults);;
-            //CSVWriter(resultsAfterUpdate, fileName);
+            CSVWriter(resultsAfterUpdate, fileName);
             ConsoleWriter(resultsAfterUpdate);
         }
 
